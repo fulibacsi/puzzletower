@@ -37,7 +37,7 @@ class MainMenu extends Phaser.Scene {
         // PLAYER SETUP
         this.add.text(330, 335, 'PLAYERS', assets.texts['menu']);
         this.player_display = this.add.text(392, 365, players, assets.texts['menu']);
-        this.remove_player_button = this.add.image(360, 370, 'icon_right')
+        this.remove_player_button = this.add.image(360, 370, 'icon_left')
                                             .setOrigin(0, 0)
                                             .setInteractive({ useHandCursor: true })
                                             .on('pointerdown', function (event) {
@@ -46,7 +46,7 @@ class MainMenu extends Phaser.Scene {
                                                 this.player_display.setText(players);
                                                 console.log(players);
                                             }, this);
-        this.add_player_button = this.add.image(420, 370, 'icon_left')
+        this.add_player_button = this.add.image(420, 370, 'icon_right')
                                          .setOrigin(0, 0)
                                          .setInteractive({ useHandCursor: true })
                                          .on('pointerdown', function (event) {
@@ -59,14 +59,14 @@ class MainMenu extends Phaser.Scene {
         // ROUND SETUP
         this.add.text(340, 405, 'ROUNDS', assets.texts['menu']);
         this.round_display = this.add.text(392, 435, rounds, assets.texts['menu']);
-        this.remove_round_button = this.add.image(360, 440, 'icon_right')
+        this.remove_round_button = this.add.image(360, 440, 'icon_left')
                                            .setOrigin(0, 0)
                                            .setInteractive({ useHandCursor: true })
                                            .on('pointerdown', function (event) {
                                              rounds = Math.max(1, rounds - 1);
                                              this.round_display.setText(rounds);
                                            }, this);
-        this.add_round_button = this.add.image(420, 440, 'icon_left')
+        this.add_round_button = this.add.image(420, 440, 'icon_right')
                                         .setOrigin(0, 0)
                                         .setInteractive({ useHandCursor: true })
                                         .on('pointerdown', function (event) {
@@ -77,14 +77,14 @@ class MainMenu extends Phaser.Scene {
         // TIMER SETUP
         this.add.text(350, 475, 'TIMER', assets.texts['menu']);
         this.timer_display = this.add.text(392, 505, timer, assets.texts['menu']);
-        this.remove_timer_button = this.add.image(360, 510, 'icon_right')
+        this.remove_timer_button = this.add.image(360, 510, 'icon_left')
                                            .setOrigin(0, 0)
                                            .setInteractive({ useHandCursor: true })
                                            .on('pointerdown', function (event) {
                                                timer = Math.max(10, timer - 5);
                                                this.timer_display.setText(timer);
                                            }, this);
-        this.add_timer_button = this.add.image(435, 510, 'icon_left')
+        this.add_timer_button = this.add.image(435, 510, 'icon_right')
                                         .setOrigin(0, 0)
                                         .setInteractive({ useHandCursor: true })
                                            .on('pointerdown', function (event) {
