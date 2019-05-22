@@ -41,19 +41,25 @@ class MainMenu extends Phaser.Scene {
                                             .setOrigin(0, 0)
                                             .setInteractive({ useHandCursor: true })
                                             .on('pointerdown', function (event) {
-                                                console.log('REMOVE PLYAER', players);
-                                                players = Math.max(1, players - 1);
-                                                this.player_display.setText(players);
-                                                console.log(players);
+                                                if (players > 1) {
+                                                    players--;
+                                                    this.player_display.setText(players);
+                                                    this.sound.play('ok');
+                                                } else {
+                                                    this.sound.play('error');
+                                                }
                                             }, this);
         this.add_player_button = this.add.image(420, 370, 'icon_right')
                                          .setOrigin(0, 0)
                                          .setInteractive({ useHandCursor: true })
                                          .on('pointerdown', function (event) {
-                                             console.log('ADD PLYAER', players);
-                                             players = Math.min(4, players + 1);
-                                             this.player_display.setText(players);
-                                             console.log(players);
+                                            if (players < 4) {
+                                                players++;
+                                                this.player_display.setText(players);
+                                                this.sound.play('ok');
+                                            } else {
+                                                this.sound.play('error');
+                                            }
                                          }, this);
 
         // ROUND SETUP
@@ -63,15 +69,25 @@ class MainMenu extends Phaser.Scene {
                                            .setOrigin(0, 0)
                                            .setInteractive({ useHandCursor: true })
                                            .on('pointerdown', function (event) {
-                                             rounds = Math.max(1, rounds - 1);
-                                             this.round_display.setText(rounds);
+                                              if (rounds > 1) {
+                                                  rounds--;
+                                                  this.round_display.setText(rounds);
+                                                  this.sound.play('ok');
+                                              } else {
+                                                  this.sound.play('error');
+                                              }
                                            }, this);
         this.add_round_button = this.add.image(420, 440, 'icon_right')
                                         .setOrigin(0, 0)
                                         .setInteractive({ useHandCursor: true })
                                         .on('pointerdown', function (event) {
-                                            rounds = Math.min(10, rounds + 1);
-                                            this.round_display.setText(rounds);
+                                            if (rounds < 10) {
+                                                rounds++;
+                                                this.round_display.setText(rounds);
+                                                this.sound.play('ok');
+                                            } else {
+                                                this.sound.play('error');
+                                            }
                                         }, this);
 
         // TIMER SETUP
@@ -81,15 +97,25 @@ class MainMenu extends Phaser.Scene {
                                            .setOrigin(0, 0)
                                            .setInteractive({ useHandCursor: true })
                                            .on('pointerdown', function (event) {
-                                               timer = Math.max(10, timer - 5);
-                                               this.timer_display.setText(timer);
+                                               if (timer > 10) {
+                                                   timer -= 5;
+                                                   this.timer_display.setText(timer);
+                                                   this.sound.play('ok');
+                                               } else {
+                                                   this.sound.play('error');
+                                               }
                                            }, this);
         this.add_timer_button = this.add.image(435, 510, 'icon_right')
                                         .setOrigin(0, 0)
                                         .setInteractive({ useHandCursor: true })
                                            .on('pointerdown', function (event) {
-                                               timer = Math.min(50, timer + 5);
-                                               this.timer_display.setText(timer);
+                                               if (timer < 50) {
+                                                   timer += 5;
+                                                   this.timer_display.setText(timer);
+                                                   this.sound.play('ok');
+                                               } else {
+                                                   this.sound.play('error');
+                                               }
                                            }, this);
     }
 }

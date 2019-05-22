@@ -114,11 +114,6 @@ class PuzzleTower extends Phaser.Scene {
                                                    'score: 0\n wins: 0',
                                                    assets.texts[name]['board']).setOrigin(0.25, 0);
         }
-
-        // sounds
-        this.snd_ok = this.sound.add('ok');
-        this.snd_err = this.sound.add('error');
-
     }
 
 
@@ -130,7 +125,6 @@ class PuzzleTower extends Phaser.Scene {
 
         for (var name in this.players) {
             // get player stuff
-            var player = this.players[name];
             var cursor = this.cursors[name];
 
             // add command
@@ -180,7 +174,7 @@ class PuzzleTower extends Phaser.Scene {
                                                       this.next_shapes[name]).setOrigin(0, 0);
 
                     // sound
-                    this.sound.play('error');
+                    this.sound.play('explosion');
                 }
 
                 // score update
@@ -201,12 +195,12 @@ class PuzzleTower extends Phaser.Scene {
             // drop command
             else if (Phaser.Input.Keyboard.JustDown(cursor.drop)) {
                 // sound
-                if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name])) {
+                if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name], true)) {
                     console.log(name, ' MISS COMP!');
                     this.sound.play('error');
                 } else {
                     console.log(name, ' GOOD CALL!');
-                    this.sound.play('ok');
+                    // this.sound.play('ok');
                 }
 
                 // remove dropped shape

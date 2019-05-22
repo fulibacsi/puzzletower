@@ -25,7 +25,8 @@ class Player {
             this.tower.push(next);
 
             // add to visible part
-            next_img.setPosition(this.offsetX, this.offsetY + (7 - this.height()) * 32);
+            // next_img.setPosition(this.offsetX, this.offsetY + (7 - this.height()) * 32);
+            utils.moveTo(scene, next_img, this.offsetX, this.offsetY + (7 - this.height()) * 32, 3, 'dust');
             this.visible.push(next_img);
 
             if (this.visible.length > 5) {
@@ -63,17 +64,8 @@ class Player {
             //             ' vis del size: ', this.visible.slice(1).length);
             this.tower = this.tower.slice(0, Math.max(1, this.tower.length - this.height() + 1));
 
-
-
             for (var img of this.visible.slice(1)) {
-                var explosion = scene.add.sprite(img.x + 8, img.y + 8, 'explosion').setOrigin(0, 0).setDepth(2);
-                scene.anims.create({
-                    key: 'exp',
-                    frames: scene.anims.generateFrameNumbers('explosion', { start: 0, end: 33 }),
-                    frameRate: 60,
-                    repeat: 0
-                });
-                explosion.play('exp');
+                utils.play_animation(scene, 'explosion', img.x + 8, img.y + 8);
                 img.destroy();
             }
             this.visible = this.visible.slice(0, 1);

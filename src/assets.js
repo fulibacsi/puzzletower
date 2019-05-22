@@ -80,6 +80,8 @@ var assets = new function() {
     this.anims = {
         'explosion': {'src': 'assets/img/exp.png',
                       'params': { frameWidth: 32, frameHeight: 32 }},
+        'dust': {'src': 'assets/img/dust.png',
+                 'params': { frameWidth: 48, frameHeight: 48 }},
     }
 
     this.sounds = {
@@ -87,7 +89,8 @@ var assets = new function() {
                'assets/sound/ok2.wav',
                'assets/sound/ok3.wav',
                'assets/sound/ok4.wav'],
-        'error': ['assets/sound/error.wav']
+        'error': ['assets/sound/error.wav'],
+        'explosion': ['assets/sound/explosion.wav'],
     }
 
     this.texts = {
