@@ -20,6 +20,7 @@ class MainMenu extends Phaser.Scene {
     create() {
         this.add.image(0, 0, 'background').setOrigin(0, 0);
         this.add.image(100, 100, 'logo').setOrigin(0, 0);
+        this.add.image(100, 280, 'round_modal').setOrigin(0, 0);
 
         var players = 4;
         var rounds = 5;
@@ -139,7 +140,6 @@ class RoundUp extends Phaser.Scene {
             this.add.text(380, 150 + 30 * (i + 1), data.winners[i], assets.texts['menu'])
                      .setOrigin(0, 0);
         }
-        this.add.text
         this.round_countdown = 3;
         this.round_countdown_display = this.add.text(380, 320,
                                                      this.round_countdown.toString(),
@@ -152,8 +152,10 @@ class RoundUp extends Phaser.Scene {
             'callback': function(scene) {
                 scene.round_countdown--;
                 scene.round_countdown_display.setText(scene.round_countdown.toString());
+                scene.sound.play('beep1');
 
                 if (scene.round_countdown <= 0) {
+                    scene.sound.play('beep2')
                     scene.scene.resume('PuzzleTower');
                     scene.scene.stop();
                 }

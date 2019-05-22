@@ -40,7 +40,7 @@ class PuzzleTower extends Phaser.Scene {
         this.timer_display = this.add.text(350, 500, '00:' + this.remaining_time.toString(), assets.texts['timer']).setDepth(1);
         this.timer = this.time.addEvent({
             'delay': 1000, // every second
-            'repeat': 31,
+            'repeat': this.round_time + 1,
             'startAt': 0,
             'callback': function(scene) {
                 if (scene.remaining_time < 0) {
@@ -218,6 +218,7 @@ class PuzzleTower extends Phaser.Scene {
 
     decide_winners() {
         console.log('DECIDING WINNERS');
+        this.scene.pause();
         // winner computation
         var winners = utils.get_winners(this.players);
         for (var winner of winners) {
@@ -225,7 +226,6 @@ class PuzzleTower extends Phaser.Scene {
         }
         this.scene.launch('RoundUp', {'round_number': this.round_number,
                                       'winners': winners});
-        this.scene.pause();
         this.reset(this);
 
     }
@@ -237,6 +237,7 @@ class PuzzleTower extends Phaser.Scene {
         // countdown
         scene.remaining_time = scene.round_time;
         scene.timer_display.setText('00:' + scene.remaining_time.toString());
+        scene.timer.remove()
         scene.timer = scene.time.addEvent({
             'delay': 1000, // every second
             'repeat': 31,
