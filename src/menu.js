@@ -45,7 +45,7 @@ class MainMenu extends Phaser.Scene {
                                                 if (players > 1) {
                                                     players--;
                                                     this.player_display.setText(players);
-                                                    this.sound.play('ok');
+                                                    this.sound.play('ok1');
                                                 } else {
                                                     this.sound.play('error');
                                                 }
@@ -57,7 +57,7 @@ class MainMenu extends Phaser.Scene {
                                             if (players < 4) {
                                                 players++;
                                                 this.player_display.setText(players);
-                                                this.sound.play('ok');
+                                                this.sound.play('ok1');
                                             } else {
                                                 this.sound.play('error');
                                             }
@@ -73,7 +73,7 @@ class MainMenu extends Phaser.Scene {
                                               if (rounds > 1) {
                                                   rounds--;
                                                   this.round_display.setText(rounds);
-                                                  this.sound.play('ok');
+                                                  this.sound.play('ok1');
                                               } else {
                                                   this.sound.play('error');
                                               }
@@ -85,7 +85,7 @@ class MainMenu extends Phaser.Scene {
                                             if (rounds < 10) {
                                                 rounds++;
                                                 this.round_display.setText(rounds);
-                                                this.sound.play('ok');
+                                                this.sound.play('ok1');
                                             } else {
                                                 this.sound.play('error');
                                             }
@@ -101,7 +101,7 @@ class MainMenu extends Phaser.Scene {
                                                if (timer > 10) {
                                                    timer -= 5;
                                                    this.timer_display.setText(timer);
-                                                   this.sound.play('ok');
+                                                   this.sound.play('ok1');
                                                } else {
                                                    this.sound.play('error');
                                                }
@@ -113,7 +113,7 @@ class MainMenu extends Phaser.Scene {
                                                if (timer < 50) {
                                                    timer += 5;
                                                    this.timer_display.setText(timer);
-                                                   this.sound.play('ok');
+                                                   this.sound.play('ok1');
                                                } else {
                                                    this.sound.play('error');
                                                }
@@ -140,31 +140,14 @@ class RoundUp extends Phaser.Scene {
             this.add.text(380, 150 + 30 * (i + 1), data.winners[i], assets.texts['menu'])
                      .setOrigin(0, 0);
         }
-        this.round_countdown = 3;
-        this.round_countdown_display = this.add.text(380, 320,
-                                                     this.round_countdown.toString(),
-                                                     assets.texts['menu']).setOrigin(0, 0);
 
-        this.time.addEvent({
-            'delay': 1500,
-            'repeat': 3,
-            'startAt': 0,
-            'callback': function(scene) {
-                scene.round_countdown--;
-                scene.round_countdown_display.setText(scene.round_countdown.toString());
-                scene.sound.play('beep1');
-
-                if (scene.round_countdown <= 0) {
-                    scene.sound.play('beep2')
-                    scene.scene.resume('PuzzleTower');
-                    scene.scene.stop();
-                }
-            },
-            'args': [this]
-        });
+        this.input.once('pointerdown', function (event) {
+            this.scene.resume('PuzzleTower');
+            this.scene.get('PuzzleTower').countdown();
+            this.scene.stop();
+        }, this);
     }
 }
-
 
 
 class ResultScene extends Phaser.Scene {
@@ -191,5 +174,47 @@ class ResultScene extends Phaser.Scene {
         this.input.once('pointerdown', function (event) {
             this.scene.start("MainMenu");
         }, this);
+    }
+}
+
+
+class CountDownScene extends Phaser.Scene {
+    constructor() {
+        super({key: "countdown"});
+    }
+
+    create(data) {
+        this.countdown = data.countdown;
+
+        // clear ongoing animations
+        for (var key in data.anims) {
+            data.anims[key].destroy();
+        }
+
+        // add countdown
+        this.display = this.add.text(400, 200, this.countdown, assets.texts['countdown'])
+                               .setOrigin(0, 0)
+                               .setDepth(1);
+        this.sound.play('beep1');
+
+        // update countdown
+        this.time.addEvent({
+            'delay': 1000,
+            'repeat': 3,
+            'startAt': 0,
+            'callback': function(scene) {
+                scene.countdown--;
+                scene.display.setText(scene.countdown.toString());
+                scene.sound.play('beep1');
+
+                if (scene.countdown <= 0) {
+                    scene.sound.play('beep2')
+                    scene.scene.resume('PuzzleTower');
+                    scene.scene.stop();
+                }
+            },
+            'args': [this]
+        });
+
     }
 }

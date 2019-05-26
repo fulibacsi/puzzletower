@@ -24,36 +24,41 @@ class Player {
             // add to player's tower
             this.tower.push(next);
 
-            // add to visible part
-            // next_img.setPosition(this.offsetX, this.offsetY + (7 - this.height()) * 32);
-            utils.moveTo(scene, next_img, this.offsetX, this.offsetY + (7 - this.height()) * 32, 3, 'dust');
-            this.visible.push(next_img);
+            // with this shape, tower levels up
+            if (this.visible.length > 4) {
+                this.visible.push(next_img);
+                this.level_up(scene);
+            }
 
-            if (this.visible.length > 5) {
-                this.level_up();
+            // add item without level up
+            else {
+                let x = this.offsetX;
+                let y = this.offsetY + (7 - this.height()) * 32;
+                utils.moveTo(scene, next_img, x, y, 3,
+                            utils.play_animation, [scene, 'dust', x, y]);
+                this.visible.push(next_img);
             }
 
             // update score
             score_diff = this.update_score();
         }
 
+        // collapse automatically updates scores (so it can be called from the outside)
         else {
-            // collapse automatically updates scores (so it can be called from the outside)
             score_diff = this.collapse(scene);
         }
 
         // console.log(this.name, ' score diff after adding: ', score_diff);
-        // return score diff
         return score_diff;
     }
 
-    level_up() {
+    level_up(scene) {
         console.log(this.name + ' LVLUP!');
         for (var img of this.visible.slice(0, this.visible.length - 1)) {
             img.destroy();
         }
         this.visible = this.visible.slice(this.visible.length - 1);
-        this.visible[0].setPosition(this.offsetX, this.offsetY + 7 * 32);
+        utils.moveTo(scene, this.visible[0], this.offsetX, this.offsetY + 7 * 32, 3);
     }
 
     collapse(scene) {

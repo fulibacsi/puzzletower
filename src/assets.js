@@ -85,10 +85,10 @@ var assets = new function() {
     }
 
     this.sounds = {
-        'ok': ['assets/sound/ok1.wav',
-               'assets/sound/ok2.wav',
-               'assets/sound/ok3.wav',
-               'assets/sound/ok4.wav'],
+        'ok1': ['assets/sound/ok1.wav'],
+        'ok2': ['assets/sound/ok2.wav'],
+        'ok3': ['assets/sound/ok3.wav'],
+        'ok4': ['assets/sound/ok4.wav'],
         'error': ['assets/sound/error.wav'],
         'explosion': ['assets/sound/explosion.wav'],
         'beep1': ['assets/sound/beep1.wav'],
@@ -116,13 +116,15 @@ var assets = new function() {
                   fill: '#fff', stroke: '#000', strokeThickness: 3, align: 'center' },
         'timer': { fontSize: '40px', fill: '#fff', fontFamily: 'sans-serif', fontStyle: 'bold',
                    stroke: '#000', strokeThickness: 4, align: 'center' },
+        'countdown': { fontSize: '80px', fill: '#fff', fontFamily: 'invasion', fontStyle: 'bold',
+                       stroke: '#000', strokeThickness: 8, align: 'center' },
         'controls': { fontSize: '20px', fill: '#fff', fontFamily: 'sans-serif',fontStyle: 'bold' },
     }
 
     this.controls = {
-        'p1': {'add': 'right', 'drop': 'left'},
-        'p2': {'add': 'W', 'drop': 'Q'},
-        'p3': {'add': 'B', 'drop': 'V'},
-        'p4': {'add': 'O', 'drop': 'I'},
+        'p1': {'drop': 'right', 'skip': 'left'},
+        'p2': {'drop': 'W', 'skip': 'Q'},
+        'p3': {'drop': 'B', 'skip': 'V'},
+        'p4': {'drop': 'O', 'skip': 'I'},
     }
 }

@@ -17,3 +17,4 @@ game.scene.add('MainMenu', MainMenu, true);
 game.scene.add('PuzzleTower', PuzzleTower, false);
 game.scene.add('Results', ResultScene, false);
 game.scene.add('RoundUp', RoundUp, false);
+game.scene.add('countdown', CountDownScene, false);

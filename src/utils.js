@@ -21,12 +21,12 @@ var utils = new function() {
         return winners;
     }
 
-    this.moveTo = function(scene, obj, x, y, time=600, animation) {
+    this.moveTo = function(scene, obj, x, y, time=600, callback, args) {
         var delay;
         var steps;
         if (time < 60) {
-            steps = time;
             delay = 1;
+            steps = time;
         } else {
             delay = Math.round(time / 60);
             steps = 60;
@@ -35,30 +35,39 @@ var utils = new function() {
         dx = (x - obj.x) / steps;
         dy = (y - obj.y) / steps;
 
-        console.log('START (', obj.x, ',', obj.y, '); END (', x, ',', y, ')');
-        console.log('delay:', delay, 'steps:', steps, ', dx:', dx, ', dy:', dy);
-        console.log('Expected END (', obj.x + dx*60, ',', obj.y + dy*60, ')');
+        // console.log('START (', obj.x, ',', obj.y, '); END (', x, ',', y, ')');
+        // console.log('delay:', delay, 'steps:', steps, ', dx:', dx, ', dy:', dy);
+        // console.log('Expected END (', obj.x + dx*steps, ',', obj.y + dy*steps, ')');
 
-        var timer = scene.time.addEvent({
+        // moving img
+        scene.time.addEvent({
             delay: delay,
             callback: utils.step,
             repeat: steps,
             args: [obj, x, y, dx, dy]
         });
 
-        if ((animation !== undefined) && (animation !== null)) {
+        // add callback
+        if ((callback !== undefined) && (callback !== null)) {
             scene.time.addEvent({
                 delay: time,
-                callback: utils.play_animation,
+                callback: callback,
                 repeat: 0,
-                args: [scene, animation, x, y]
+                args: args
             });
         }
     }
 
     this.step = function(obj, x, y, dx, dy) {
-        var newx = obj.x < x ? Math.min(x, obj.x + dx): Math.max(x, obj.x + dx);
-        var newy = obj.y < y ? Math.min(y, obj.y + dy): Math.max(y, obj.y + dx);
+        var newx = obj.x + dx;
+        if (dx < 0) newx =  Math.max(x, newx);
+        else if (dx > 0) newx =  Math.min(x, newx);
+
+        var newy = obj.y + dy;
+        if (dy < 0) newy =  Math.max(y, newy);
+        else if (dy > 0) newy =  Math.min(y, newy);
+
+        // console.log('OBJ(', obj.x, obj.y, ') + D(', dx, dy, ') = ( ', newx, newy, '), exp:(', x, y, ')');
         obj.setPosition(newx, newy);
     }
 
@@ -72,4 +81,9 @@ var utils = new function() {
         });
         anim.play(animation + '_anim',);
     }
+
+    this.destroy = function(obj) {
+        obj.destroy();
+    }
+
 };

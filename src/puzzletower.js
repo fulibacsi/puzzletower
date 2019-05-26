@@ -5,7 +5,6 @@ class PuzzleTower extends Phaser.Scene {
     }
 
     create(data) {
-
         this.number_of_players = data.players;
         this.number_of_rounds = data.rounds;
         this.round_number = 1;
@@ -45,10 +44,6 @@ class PuzzleTower extends Phaser.Scene {
             'callback': function(scene) {
                 if (scene.remaining_time < 0) {
                     scene.decide_winners();
-                    scene.round_number++;
-                    if (scene.round_number > scene.number_of_rounds) {
-                        scene.scene.start("Results", {'players': scene.players});
-                    };
                 }
 
                 var sectext = scene.remaining_time > 9 ? scene.remaining_time.toString() : '0' + scene.remaining_time.toString();
@@ -114,6 +109,9 @@ class PuzzleTower extends Phaser.Scene {
                                                    'score: 0\n wins: 0',
                                                    assets.texts[name]['board']).setOrigin(0.25, 0);
         }
+
+        // display countdown scene
+        this.countdown();
     }
 
 
@@ -127,8 +125,8 @@ class PuzzleTower extends Phaser.Scene {
             // get player stuff
             var cursor = this.cursors[name];
 
-            // add command
-            if (Phaser.Input.Keyboard.JustDown(cursor.add)) {
+            // drop command
+            if (Phaser.Input.Keyboard.JustDown(cursor.drop)) {
                 var score_diff = 0;
 
                 // match!
@@ -143,7 +141,7 @@ class PuzzleTower extends Phaser.Scene {
                                                       this.next_shapes[name]).setOrigin(0, 0);
 
                     // sound
-                    this.sound.play('ok');
+                    this.sound.play('ok1');
 
                     // land
                     if (this.players[name].tower.length > 15) {
@@ -192,19 +190,26 @@ class PuzzleTower extends Phaser.Scene {
                 }
             }
 
-            // drop command
-            else if (Phaser.Input.Keyboard.JustDown(cursor.drop)) {
+            // skip command
+            else if (Phaser.Input.Keyboard.JustDown(cursor.skip)) {
+                // visual feedback
+                utils.moveTo(this,
+                             this.nexts[name],
+                             this.nexts[name].x - 128,
+                             this.nexts[name].y,
+                             100,
+                             utils.destroy,
+                             [this.nexts[name]]
+                             );
+
                 // sound
                 if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name], true)) {
                     console.log(name, ' MISS COMP!');
                     this.sound.play('error');
                 } else {
                     console.log(name, ' GOOD CALL!');
-                    // this.sound.play('ok');
+                    this.sound.play('ok2');
                 }
-
-                // remove dropped shape
-                this.nexts[name].destroy();
 
                 // next shape generation
                 this.next_shapes[name] = shape.generate();
@@ -224,12 +229,23 @@ class PuzzleTower extends Phaser.Scene {
         for (var winner of winners) {
             this.players[winner].wins++;
         }
-        this.scene.launch('RoundUp', {'round_number': this.round_number,
-                                      'winners': winners});
+        if (this.round_number >= this.number_of_rounds) {
+            this.scene.start("Results", {'players': this.players});
+        }
+        else {
+            this.scene.launch('RoundUp', {'round_number': this.round_number,
+                                        'winners': winners});
+        }
+        this.round_number++;
         this.reset(this);
-
     }
 
+    countdown() {
+        this.scene.setVisible(true, 'countdown');
+        this.scene.run('countdown', {'countdown': 3, 'anims': this.scene.anims});
+        this.scene.pause();
+
+    }
 
     reset(scene) {
         console.log('RESET!');
@@ -245,10 +261,6 @@ class PuzzleTower extends Phaser.Scene {
             'callback': function(scene) {
                 if (scene.remaining_time < 0) {
                     scene.decide_winners();
-                    scene.round_number++;
-                    if (scene.round_number > scene.number_of_rounds) {
-                        scene.scene.start("Results", {'players': scene.players});
-                    };
                 }
 
                 var sectext = scene.remaining_time > 9 ? scene.remaining_time.toString() : '0' + scene.remaining_time.toString();
