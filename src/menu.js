@@ -37,6 +37,12 @@ class MainMenu extends Phaser.Scene {
                                         this.setColor('#fff');
                                     })
                                     .on('pointerdown', function (event) {
+                                        // analytics
+                                        gtag('event', 'start', {
+                                            'event_category': 'GAME',
+                                            'event_label': players.toString() + ' player'
+                                        });
+
                                         this.scene.start("PuzzleTower", {'players': players,
                                                                          'rounds': rounds,
                                                                          'round_time': timer});
@@ -207,11 +213,6 @@ class CountDownScene extends Phaser.Scene {
 
     create(data) {
         this.countdown = data.countdown;
-
-        // clear ongoing animations
-        for (var key in data.anims) {
-            data.anims[key].destroy();
-        }
 
         // add countdown
         this.display = this.add.text(400, 200, this.countdown, assets.texts['countdown'])

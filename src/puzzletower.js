@@ -131,6 +131,13 @@ class PuzzleTower extends Phaser.Scene {
 
                 // match!
                 if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name])) {
+                    // ANALYTICS
+                    gtag('event', 'success', {
+                        'event_category': 'drop',
+                        'event_label': name,
+                        'event_value': 1
+                    });
+
                     // shape movement
                     score_diff = this.players[name].add_shape(this.next_shapes[name], this.nexts[name], this);
 
@@ -160,6 +167,12 @@ class PuzzleTower extends Phaser.Scene {
 
                 // mismatch!
                 else {
+                    // ANALYTICS
+                    gtag('event', 'fail', {
+                        'event_category': 'drop',
+                        'event_label': name,
+                        'event_value': 1
+                    });
                     console.log(name, ' MISS!');
                     // remove dropped shape
                     this.nexts[name].destroy();
@@ -202,11 +215,27 @@ class PuzzleTower extends Phaser.Scene {
                              [this.nexts[name]]
                              );
 
-                // sound
+                // sound + analytics
                 if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name], true)) {
+                    // ANALYTICS
+                    gtag('event', 'fail', {
+                        'event_category': 'skip',
+                        'event_label': name,
+                        'event_value': 1
+                    });
+
                     console.log(name, ' MISS COMP!');
                     this.sound.play('error');
-                } else {
+                }
+
+                else {
+                    // ANALYTICS
+                    gtag('event', 'success', {
+                        'event_category': 'skip',
+                        'event_label': name,
+                        'event_value': 1
+                    });
+
                     console.log(name, ' GOOD CALL!');
                     this.sound.play('ok2');
                 }
@@ -241,8 +270,11 @@ class PuzzleTower extends Phaser.Scene {
     }
 
     countdown() {
+        for (var key in assets.anims) {
+            this.anims.remove(key + '_anim');
+        }
         this.scene.setVisible(true, 'countdown');
-        this.scene.run('countdown', {'countdown': 3, 'anims': this.scene.anims});
+        this.scene.run('countdown', {'countdown': 3});
         this.scene.pause();
 
     }

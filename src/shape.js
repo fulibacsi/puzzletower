@@ -9,7 +9,15 @@ var shape = new function() {
         var down = shape_array[utils.randint(0, shape_array.length)];
         var color = color_array[utils.randint(0, color_array.length)];
 
-        return up + down + '_' + color;
+        var generated = up + down + '_' + color;
+
+        // ANALYTICS
+        gtag('event', 'shape', {
+            'event_category': 'generated',
+            'event_label': generated
+        });
+
+        return generated;
     }
 
     this.check_compatibility = function(base, next, check_color=false) {

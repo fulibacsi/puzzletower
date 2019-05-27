@@ -16,6 +16,12 @@ var utils = new function() {
         for (var name in players) {
             if (scores[name] == max_score) {
                 winners.push(name);
+
+                // ANALYTICS
+                gtag('event', 'roundpoints', {
+                    'event_label': name,
+                    'event_value': scores[name]
+                });
             }
         }
         return winners;
@@ -79,7 +85,7 @@ var utils = new function() {
             frameRate: 60,
             repeat: 0
         });
-        anim.play(animation + '_anim',);
+        anim.play(animation + '_anim');
     }
 
     this.destroy = function(obj) {
