@@ -88,8 +88,8 @@ class PuzzleTower extends Phaser.Scene {
                           assets.texts[name]['board']).setOrigin(0, 0);
 
             // control
-            var drop_text = name != 'p1' ? assets.controls[name]['drop'] : '<'
-            var add_text = name != 'p1' ? assets.controls[name]['add'] : '>'
+            var drop_text = name != 'p1' ? assets.controls[name]['skip'] : '<'
+            var add_text = name != 'p1' ? assets.controls[name]['drop'] : '>'
             this.add.text(this.players[name].offsetX - 13,
                           this.players[name].offsetY + 373,
                           drop_text,

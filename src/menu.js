@@ -27,13 +27,25 @@ class MainMenu extends Phaser.Scene {
         var timer = 30;
 
         // START
+        // either use the mounse
         this.start_button = this.add.text(350, 300, 'START', assets.texts['menu'])
                                     .setInteractive({ useHandCursor: true })
+                                    .on('pointerover', function (event) {
+                                        this.setColor('#f00');
+                                    })
+                                    .on('pointerout', function (event) {
+                                        this.setColor('#fff');
+                                    })
                                     .on('pointerdown', function (event) {
                                         this.scene.start("PuzzleTower", {'players': players,
                                                                          'rounds': rounds,
                                                                          'round_time': timer});
                                     }, this);
+
+        // or press space
+        this.input.keyboard.on('keydown-SPACE', function (event) {
+            this.scene.start("PuzzleTower", {'players': players, 'rounds': rounds, 'round_time': timer});
+        }, this);
 
         // PLAYER SETUP
         this.add.text(330, 335, 'PLAYERS', assets.texts['menu']);
@@ -136,16 +148,22 @@ class RoundUp extends Phaser.Scene {
                       'ROUND ' + data.round_number.toString() + ' WINNERS:',
                       assets.texts['menu']).setOrigin(0, 0);
 
+        // WINNER LIST
         for (var i=0; i < data.winners.length; i++) {
             this.add.text(380, 150 + 30 * (i + 1), data.winners[i], assets.texts['menu'])
                      .setOrigin(0, 0);
         }
 
-        this.input.once('pointerdown', function (event) {
+        // PRESS SPACE TO CONTINUE...
+        this.add.text(140, 330, 'PRESS SPACE TO CONTIUE...', assets.texts['menu']).setOrigin(0, 0);
+
+        // SPACE PRESS EVENT
+        this.input.keyboard.on('keydown-SPACE', function (event) {
             this.scene.resume('PuzzleTower');
             this.scene.get('PuzzleTower').countdown();
             this.scene.stop();
         }, this);
+
     }
 }
 
@@ -165,13 +183,17 @@ class ResultScene extends Phaser.Scene {
         var i = 0;
         for (var name in data.players) {
             var result_text = name + ' won ' + data.players[name].wins.toString() + ' times.'
-            var display = this.add.text(280, 200 + 30 * i++, result_text, assets.texts['menu']);
+            var display = this.add.text(260, 180 + 30 * i++, result_text, assets.texts['menu']);
             if (winners.includes(name)) {
                 display.setColor('#f00');
             }
         }
 
-        this.input.once('pointerdown', function (event) {
+        // PRESS SPACE TO CONTINUE...
+        this.add.text(140, 330, 'PRESS SPACE TO CONTIUE...', assets.texts['menu']).setOrigin(0, 0);
+
+        // SPACE PRESS EVENT
+        this.input.keyboard.on('keydown-SPACE', function (event) {
             this.scene.start("MainMenu");
         }, this);
     }
