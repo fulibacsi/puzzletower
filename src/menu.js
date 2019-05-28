@@ -170,6 +170,13 @@ class RoundUp extends Phaser.Scene {
             this.scene.stop();
         }, this);
 
+        // CLICK EVENT
+        this.input.on('pointerdown', function (event) {
+            this.scene.resume('PuzzleTower');
+            this.scene.get('PuzzleTower').countdown();
+            this.scene.stop();
+        }, this);
+
     }
 }
 
@@ -200,6 +207,11 @@ class ResultScene extends Phaser.Scene {
 
         // SPACE PRESS EVENT
         this.input.keyboard.on('keydown-SPACE', function (event) {
+            this.scene.start("MainMenu");
+        }, this);
+
+        // SPACE PRESS EVENT
+        this.input.on('pointerdown', function (event) {
             this.scene.start("MainMenu");
         }, this);
     }
