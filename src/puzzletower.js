@@ -12,6 +12,7 @@ class PuzzleTower extends Phaser.Scene {
 
         console.log(this.number_of_players, 'players are playing for', this.number_of_rounds, 'rounds.');
 
+        // players
         this.players = {}
         for (var i=0; i < this.number_of_players; i++) {
             var name = 'p' + (i + 1).toString();
@@ -127,6 +128,12 @@ class PuzzleTower extends Phaser.Scene {
 
         // display countdown scene
         this.countdown();
+
+        // ENABLE SWIPE CONTROLS IF ONLY 1 PLAYER PLAYS
+        this.nextmove = undefined;
+        if (this.number_of_players == 1) {
+            this.input.on("pointerup", this.endSwipe, this);
+        }
     }
 
 
@@ -134,6 +141,19 @@ class PuzzleTower extends Phaser.Scene {
         if (Phaser.Input.Keyboard.JustDown(this.esckey)) {
             this.scene.start('MainMenu');
         }
+
+        // TOUCH CONTROLS FOR P1
+        if (this.number_of_players == 1) {
+            if (this.nextmove == 'drop') {
+                this.drop('p1');
+                this.nextmove = undefined;
+            }
+            else if (this.nextmove == 'skip') {
+                this.skip('p1')
+                this.nextmove = undefined;
+            }
+        }
+
 
         // get leaders
         var leaders = utils.get_leaders(this.players);
@@ -147,123 +167,129 @@ class PuzzleTower extends Phaser.Scene {
             else this.leader_effects[name].setAlpha(0);
 
             // drop command
-            if (Phaser.Input.Keyboard.JustDown(cursor.drop)) {
-                var score_diff = 0;
-
-                // match!
-                if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name])) {
-                    // ANALYTICS
-                    gtag('event', 'success', {
-                        'event_category': 'drop',
-                        'event_label': name,
-                        'event_value': 1
-                    });
-
-                    // shape movement
-                    score_diff = this.players[name].add_shape(this.next_shapes[name], this.nexts[name], this);
-
-                    // next shape generation
-                    var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
-                    this.next_shapes[name] = selected[0];
-                    this.nexts[name] = selected[1];
-
-                    // sound
-                    this.sound.play('ok1');
-
-                    // land
-                    if (this.players[name].tower.length > 15) {
-                        this.lands[name].destroy();
-                        this.lands[name] = this.add.image(this.players[name].offsetX - 50,
-                                                          this.players[name].offsetY - 40,
-                                                          'land_2').setOrigin(0, 0);
-                    }
-                    else if (this.players[name].tower.length > 5) {
-                        this.lands[name].destroy();
-                        this.lands[name] = this.add.image(this.players[name].offsetX - 50,
-                                                          this.players[name].offsetY - 40,
-                                                          'land_1').setOrigin(0, 0);
-                    }
-                }
-
-                // mismatch!
-                else {
-                    // ANALYTICS
-                    gtag('event', 'fail', {
-                        'event_category': 'drop',
-                        'event_label': name,
-                        'event_value': 1
-                    });
-                    console.log(name, ' MISS!');
-                    // remove dropped shape
-                    this.nexts[name].destroy();
-                    score_diff = this.players[name].collapse(this);
-
-                    // next shape generation
-                    var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
-                    this.next_shapes[name] = selected[0];
-                    this.nexts[name] = selected[1];
-
-                    // sound
-                    this.sound.play('explosion');
-                }
-
-                // score update
-                if (score_diff != 0) {
-                    console.log(name, 'SCOREBOARD UPDATE!');
-                    // scoreboard update
-                    this.scoreboards[name].setText('score: ' + this.players[name].score + '\n wins: ' + this.players[name].wins);
-
-                    // score popup
-                    var scr_txt = score_diff.toString();
-                    var score_popup_text = score_diff > 0 ? '+' + scr_txt : scr_txt;
-                    this.score_popups[name].setText(score_popup_text).setDepth(1);
-                    this.time.delayedCall(500, function(name) { this.score_popups[name].setText(); }, [name], this);
-                }
-            }
+            if (Phaser.Input.Keyboard.JustDown(cursor.drop)) this.drop(name);
 
             // skip command
-            else if (Phaser.Input.Keyboard.JustDown(cursor.skip)) {
-                // visual feedback
-                utils.moveTo(this,
-                             this.nexts[name],
-                             this.nexts[name].x - 128,
-                             this.nexts[name].y,
-                             100,
-                             utils.destroy,
-                             [this.nexts[name]]
-                             );
+            else if (Phaser.Input.Keyboard.JustDown(cursor.skip)) this.skip(name);
+        }
+    }
 
-                // sound + analytics
-                if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name], true)) {
-                    // ANALYTICS
-                    gtag('event', 'fail', {
-                        'event_category': 'skip',
-                        'event_label': name,
-                        'event_value': 1
-                    });
 
-                    console.log(name, ' MISS COMP!');
-                    this.sound.play('error');
-                }
+    drop(name) {
+        var score_diff = 0;
 
-                else {
-                    // ANALYTICS
-                    gtag('event', 'success', {
-                        'event_category': 'skip',
-                        'event_label': name,
-                        'event_value': 1
-                    });
+        // match!
+        if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name])) {
+            // ANALYTICS
+            gtag('event', 'success', {
+                'event_category': 'drop',
+                'event_label': name,
+                'event_value': 1
+            });
 
-                    console.log(name, ' GOOD CALL!');
-                    this.sound.play('ok2');
-                }
+            // shape movement
+            score_diff = this.players[name].add_shape(this.next_shapes[name], this.nexts[name], this);
 
-                // next shape generation
-                var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
-                this.next_shapes[name] = selected[0];
-                this.nexts[name] = selected[1];
+            // next shape generation
+            var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
+            this.next_shapes[name] = selected[0];
+            this.nexts[name] = selected[1];
+
+            // sound
+            this.sound.play('ok1');
+
+            // land
+            if (this.players[name].tower.length > 15) {
+                this.lands[name].destroy();
+                this.lands[name] = this.add.image(this.players[name].offsetX - 50,
+                                                  this.players[name].offsetY - 40,
+                                                  'land_2').setOrigin(0, 0);
+            }
+            else if (this.players[name].tower.length > 5) {
+                this.lands[name].destroy();
+                this.lands[name] = this.add.image(this.players[name].offsetX - 50,
+                                                  this.players[name].offsetY - 40,
+                                                  'land_1').setOrigin(0, 0);
             }
         }
+
+        // mismatch!
+        else {
+            // ANALYTICS
+            gtag('event', 'fail', {
+                'event_category': 'drop',
+                'event_label': name,
+                'event_value': 1
+            });
+            console.log(name, ' MISS!');
+            // remove dropped shape
+            this.nexts[name].destroy();
+            score_diff = this.players[name].collapse(this);
+
+            // next shape generation
+            var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
+            this.next_shapes[name] = selected[0];
+            this.nexts[name] = selected[1];
+
+            // sound
+            this.sound.play('explosion');
+        }
+
+        // score update
+        if (score_diff != 0) {
+            console.log(name, 'SCOREBOARD UPDATE!');
+            // scoreboard update
+            this.scoreboards[name].setText('score: ' + this.players[name].score + '\n wins: ' + this.players[name].wins);
+
+            // score popup
+            var scr_txt = score_diff.toString();
+            var score_popup_text = score_diff > 0 ? '+' + scr_txt : scr_txt;
+            this.score_popups[name].setText(score_popup_text).setDepth(1);
+            this.time.delayedCall(500, function(name) { this.score_popups[name].setText(); }, [name], this);
+        }
+    }
+
+
+    skip(name) {
+        // visual feedback
+        utils.moveTo(this,
+                     this.nexts[name],
+                     this.nexts[name].x - 128,
+                     this.nexts[name].y,
+                     100,
+                     utils.destroy,
+                     [this.nexts[name]]
+                     );
+
+        // sound + analytics
+        if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name], true)) {
+            // ANALYTICS
+            gtag('event', 'fail', {
+                'event_category': 'skip',
+                'event_label': name,
+                'event_value': 1
+            });
+
+            console.log(name, ' MISS COMP!');
+            this.sound.play('error');
+        }
+
+        else {
+            // ANALYTICS
+            gtag('event', 'success', {
+                'event_category': 'skip',
+                'event_label': name,
+                'event_value': 1
+            });
+
+            console.log(name, ' GOOD CALL!');
+            this.sound.play('ok2');
+        }
+
+        // next shape generation
+        var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
+        this.next_shapes[name] = selected[0];
+        this.nexts[name] = selected[1];
     }
 
 
@@ -354,4 +380,20 @@ class PuzzleTower extends Phaser.Scene {
             scene.scoreboards[name].setText('score: 0\n wins: ' + scene.players[name].wins);
         }
     }
+
+
+    endSwipe(e) {
+        var swipeTime = e.upTime - e.downTime;
+        var swipe = new Phaser.Geom.Point(e.upX - e.downX, e.upY - e.downY);
+        var swipeMagnitude = Phaser.Geom.Point.GetMagnitude(swipe);
+        var swipeNormal = new Phaser.Geom.Point(swipe.x / swipeMagnitude, swipe.y / swipeMagnitude);
+
+        if(swipeMagnitude > 50 && swipeTime < 1000 && (Math.abs(swipeNormal.y) > 0.8 || Math.abs(swipeNormal.x) > 0.8)) {
+            if(Math.abs(swipeNormal.y) > Math.abs(swipeNormal.x))
+                this.nextmove = 'drop';
+            else
+                this.nextmove = 'skip';
+        }
+    }
+
 }
