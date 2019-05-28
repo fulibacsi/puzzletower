@@ -17,7 +17,7 @@ class PuzzleTower extends Phaser.Scene {
             var name = 'p' + (i + 1).toString();
             // player offset * 100 + player_pos * 200 + offset
             var offsetX = (4 - this.number_of_players) * 100 + (i * 200) + 75;
-            this.players[name] = new Player(name=name, offsetX, 50);
+            this.players[name] = new Player(name=name, offsetX, 120);
         }
 
         // new shape containers
@@ -26,6 +26,7 @@ class PuzzleTower extends Phaser.Scene {
 
         // lands + sky
         this.lands = {};
+        this.leader_effects = {};
 
         // input key container
         this.cursors = {};
@@ -36,7 +37,7 @@ class PuzzleTower extends Phaser.Scene {
 
         // countdown
         this.remaining_time = this.round_time;
-        this.timer_display = this.add.text(350, 500, '00:' + this.remaining_time.toString(), assets.texts['timer']).setDepth(1);
+        this.timer_display = this.add.text(350, 545, '00:' + this.remaining_time.toString(), assets.texts['timer']).setDepth(1);
         this.timer = this.time.addEvent({
             'delay': 1000, // every second
             'repeat': this.round_time + 1,
@@ -79,7 +80,17 @@ class PuzzleTower extends Phaser.Scene {
             // land
             this.lands[name] = this.add.image(this.players[name].offsetX - 50,
                                               this.players[name].offsetY - 40,
-                                              'land_0').setOrigin(0, 0).setDepth(1);
+                                              'land_0')
+                                        .setOrigin(0, 0)
+                                        .setDepth(1);
+
+            // leader effect
+            this.leader_effects[name] = this.add.image(this.players[name].offsetX - 50,
+                                                       this.players[name].offsetY - 40,
+                                                       'leader_effect')
+                                                .setOrigin(0, 0)
+                                                .setDepth(1)
+                                                .setAlpha(0);
 
             // name
             this.add.text(this.players[name].offsetX + 10,
@@ -110,6 +121,10 @@ class PuzzleTower extends Phaser.Scene {
                                                    assets.texts[name]['board']).setOrigin(0.25, 0);
         }
 
+        // QUEUE
+        this.add.image(140, 5, 'queue_frame').setOrigin(0, 0);
+        this.queue = new Queue(this, 150, 15, 11);
+
         // display countdown scene
         this.countdown();
     }
@@ -120,10 +135,16 @@ class PuzzleTower extends Phaser.Scene {
             this.scene.start('MainMenu');
         }
 
+        // get leaders
+        var leaders = utils.get_leaders(this.players);
 
         for (var name in this.players) {
             // get player stuff
             var cursor = this.cursors[name];
+
+            // show leader effect
+            if (leaders.includes(name)) this.leader_effects[name].setAlpha(1);
+            else this.leader_effects[name].setAlpha(0);
 
             // drop command
             if (Phaser.Input.Keyboard.JustDown(cursor.drop)) {
@@ -142,10 +163,9 @@ class PuzzleTower extends Phaser.Scene {
                     score_diff = this.players[name].add_shape(this.next_shapes[name], this.nexts[name], this);
 
                     // next shape generation
-                    this.next_shapes[name] = shape.generate();
-                    this.nexts[name] = this.add.image(this.players[name].offsetX,
-                                                      this.players[name].offsetY + 32 * 0,
-                                                      this.next_shapes[name]).setOrigin(0, 0);
+                    var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
+                    this.next_shapes[name] = selected[0];
+                    this.nexts[name] = selected[1];
 
                     // sound
                     this.sound.play('ok1');
@@ -179,10 +199,9 @@ class PuzzleTower extends Phaser.Scene {
                     score_diff = this.players[name].collapse(this);
 
                     // next shape generation
-                    this.next_shapes[name] = shape.generate();
-                    this.nexts[name] = this.add.image(this.players[name].offsetX,
-                                                      this.players[name].offsetY + 32 * 0,
-                                                      this.next_shapes[name]).setOrigin(0, 0);
+                    var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
+                    this.next_shapes[name] = selected[0];
+                    this.nexts[name] = selected[1];
 
                     // sound
                     this.sound.play('explosion');
@@ -199,7 +218,6 @@ class PuzzleTower extends Phaser.Scene {
                     var score_popup_text = score_diff > 0 ? '+' + scr_txt : scr_txt;
                     this.score_popups[name].setText(score_popup_text).setDepth(1);
                     this.time.delayedCall(500, function(name) { this.score_popups[name].setText(); }, [name], this);
-
                 }
             }
 
@@ -241,10 +259,9 @@ class PuzzleTower extends Phaser.Scene {
                 }
 
                 // next shape generation
-                this.next_shapes[name] = shape.generate();
-                this.nexts[name] = this.add.image(this.players[name].offsetX,
-                                                  this.players[name].offsetY + 32 * 0,
-                                                  this.next_shapes[name]).setOrigin(0, 0);
+                var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
+                this.next_shapes[name] = selected[0];
+                this.nexts[name] = selected[1];
             }
         }
     }

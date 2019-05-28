@@ -59,10 +59,13 @@ var assets = new function() {
         'frame_p3': 'assets/img/frame_p3.png',
         'frame_p4': 'assets/img/frame_p4.png',
 
+        'leader_effect': 'assets/img/leader_effect.png',
+
         'land_0': 'assets/img/land_0.png',
         'land_1': 'assets/img/land_1.png',
         'land_2': 'assets/img/land_2.png',
 
+        'queue_frame': 'assets/img/queue_frame.png',
         'round_modal': 'assets/img/round_modal.png',
         'logo': 'assets/img/logo.png',
         'background': 'assets/img/background2.png',
