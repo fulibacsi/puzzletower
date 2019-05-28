@@ -48,12 +48,12 @@ class Player {
             score_diff = this.collapse(scene);
         }
 
-        // console.log(this.name, ' score diff after adding: ', score_diff);
         return score_diff;
     }
 
     level_up(scene) {
         console.log(this.name + ' LVLUP!');
+
         for (var img of this.visible.slice(0, this.visible.length - 1)) {
             img.destroy();
         }
@@ -63,10 +63,8 @@ class Player {
 
     collapse(scene) {
         console.log(this.name + ' COLLAPSE!');
+
         if (this.height() > 1) {
-            // console.log('tower before: ', this.tower.length, ' vis before: ', this.visible,
-            //             ' size after:', Math.max(1, this.tower.length - this.height() + 1),
-            //             ' vis del size: ', this.visible.slice(1).length);
             this.tower = this.tower.slice(0, Math.max(1, this.tower.length - this.height() + 1));
 
             for (var img of this.visible.slice(1)) {
@@ -76,7 +74,10 @@ class Player {
             this.visible = this.visible.slice(0, 1);
             this.visible[0].setPosition(this.offsetX, this.offsetY + 7 * 32);
         }
-        // console.log(this.name, 'TOWERAFTER:', this.tower, 'VISAFTER:', this.visible);
+
+        else {
+            utils.play_animation(scene, 'explosion',this.offsetX + 8, this.offsetY + 6 * 32 + 8);
+        }
 
         // update score & return diff
         return this.update_score();

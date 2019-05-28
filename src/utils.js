@@ -6,6 +6,25 @@ var utils = new function() {
         return Math.floor(Math.random() * (max - min)) + min;
     }
 
+    this.get_leaders = function(players) {
+        var scores = {};
+        for (var name in players) {
+            scores[name] = players[name]['score'];
+        }
+
+        var max_score = Math.max(...Object.values(scores));
+        if (max_score == 0) return [];
+
+        var leaders = [];
+        for (var name in players) {
+            if (scores[name] == max_score) {
+                leaders.push(name);
+            }
+        }
+
+        return leaders;
+    }
+
     this.get_winners = function(players, score_key='score') {
         var scores = {};
         for (var name in players) {
@@ -41,6 +60,7 @@ var utils = new function() {
         dx = (x - obj.x) / steps;
         dy = (y - obj.y) / steps;
 
+        // console.log('MOVING OBJ:', obj);
         // console.log('START (', obj.x, ',', obj.y, '); END (', x, ',', y, ')');
         // console.log('delay:', delay, 'steps:', steps, ', dx:', dx, ', dy:', dy);
         // console.log('Expected END (', obj.x + dx*steps, ',', obj.y + dy*steps, ')');
