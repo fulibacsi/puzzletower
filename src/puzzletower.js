@@ -22,7 +22,6 @@ class PuzzleTower extends Phaser.Scene {
         }
 
         // new shape containers
-        this.next_shapes = {};
         this.nexts = {};
 
         // lands + sky
@@ -61,14 +60,8 @@ class PuzzleTower extends Phaser.Scene {
 
         for (var name in this.players) {
             // shapes + images
-            var base_shape = shape.generate();
-            var next_shape = shape.generate();
-
-            var base = this.add.image(this.players[name].offsetX, this.players[name].offsetY + 32 * 7, base_shape).setOrigin(0, 0);
-            this.nexts[name] = this.add.image(this.players[name].offsetX, this.players[name].offsetY + 32 * 0, next_shape).setOrigin(0, 0);
-
-            this.players[name].add_shape(base_shape, base, this);
-            this.next_shapes[name] = next_shape;
+            this.players[name].add_shape(new Shape(this.players[name].offsetX, this.players[name].offsetY + 32 * 7), this);
+            this.nexts[name] = new Shape(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
 
             // controls
             this.cursors[name] = this.input.keyboard.addKeys(assets.controls[name]);
@@ -179,7 +172,7 @@ class PuzzleTower extends Phaser.Scene {
         var score_diff = 0;
 
         // match!
-        if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name])) {
+        if (this.players[name].base_shape().check_compatibility(this.nexts[name])) {
             // ANALYTICS
             gtag('event', 'success', {
                 'event_category': 'drop',
@@ -188,7 +181,7 @@ class PuzzleTower extends Phaser.Scene {
             });
 
             // shape movement
-            score_diff = this.players[name].add_shape(this.next_shapes[name], this.nexts[name], this);
+            score_diff = this.players[name].add_shape(this.nexts[name], this);
 
             // next shape generation
             var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
@@ -228,8 +221,7 @@ class PuzzleTower extends Phaser.Scene {
 
             // next shape generation
             var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
-            this.next_shapes[name] = selected[0];
-            this.nexts[name] = selected[1];
+            this.nexts[name] = selected;
 
             // sound
             this.sound.play('explosion');
@@ -262,7 +254,7 @@ class PuzzleTower extends Phaser.Scene {
                      );
 
         // sound + analytics
-        if (shape.check_compatibility(this.players[name].base_shape(), this.next_shapes[name], true)) {
+        if (this.players[name].base_shape().check_compatibility(this.nexts[name], true)) {
             // ANALYTICS
             gtag('event', 'fail', {
                 'event_category': 'skip',
@@ -288,8 +280,7 @@ class PuzzleTower extends Phaser.Scene {
 
         // next shape generation
         var selected = this.queue.get(this.players[name].offsetX, this.players[name].offsetY + 32 * 0);
-        this.next_shapes[name] = selected[0];
-        this.nexts[name] = selected[1];
+        this.nexts[name] = selected;
     }
 
 
@@ -321,7 +312,7 @@ class PuzzleTower extends Phaser.Scene {
         this.scene.pause();
 
     }
-
+// TODO SHAPES!
     reset(scene) {
         console.log('RESET!');
 
