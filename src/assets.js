@@ -54,12 +54,20 @@ var assets = new function() {
         'VV_b': 'assets/img/VV_b.png',
         'VV_g': 'assets/img/VV_g.png',
 
+        'effect_freeze': 'assets/img/effect_freeze.png',
+        'effect_bomb': 'assets/img/effect_bomb.png',
+        'effect_shock': 'assets/img/effect_shock.png',
+        'effect_ink': 'assets/img/effect_ink.png',
+
         'frame_p1': 'assets/img/frame_p1.png',
         'frame_p2': 'assets/img/frame_p2.png',
         'frame_p3': 'assets/img/frame_p3.png',
         'frame_p4': 'assets/img/frame_p4.png',
 
-        'leader_effect': 'assets/img/leader_effect.png',
+        'frame_effect_leader': 'assets/img/frame_effect_leader.png',
+        'frame_effect_freeze': 'assets/img/frame_effect_freeze.png',
+        'frame_effect_shock': 'assets/img/frame_effect_shock.png',
+        'frame_effect_ink': 'assets/img/frame_effect_ink.png',
 
         'land_0': 'assets/img/land_0.png',
         'land_1': 'assets/img/land_1.png',
@@ -96,6 +104,9 @@ var assets = new function() {
         'explosion': ['assets/sound/explosion.wav'],
         'beep1': ['assets/sound/beep1.wav'],
         'beep2': ['assets/sound/beep2.wav'],
+        'freeze': ['assets/sound/freeze.wav'],
+        'shock': ['assets/sound/shock.wav'],
+        'ink': ['assets/sound/ink.wav'],
     }
 
     this.texts = {

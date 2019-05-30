@@ -112,4 +112,28 @@ var utils = new function() {
         obj.destroy();
     }
 
+    this.add_effect = function(scene, effect, interval, activator, players) {
+        console.log(activator + ' ' + effect + 'ed OTHERS!');
+        for(var name in players){
+            if (name != activator) {
+                // add freeze effect to player
+                var player = players[name];
+                player.active_effects.push(effect);
+
+                // remove freeze effect from players after 1.5sec
+                scene.time.addEvent({
+                    delay: interval,
+                    callback: function(player, effect) {
+                        var index = player.active_effects.indexOf(effect);
+                        if (index > -1) {
+                            player.active_effects.splice(index, 1);
+                        }
+                    },
+                    repeat: 0,
+                    args: [player, effect]
+                });
+            }
+        }
+    }
+
 };

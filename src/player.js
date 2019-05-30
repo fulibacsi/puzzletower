@@ -8,25 +8,26 @@ class Player {
         this.visible = [];
         this.score = 0;
         this.wins = 0;
+        this.active_effects = [];
     }
 
-    add_shape(next, next_img, scene) {
+    add_shape(scene, next) {
         var score_diff = 0;
         // init shape
         if (this.tower.length == 0) {
             this.tower.push(next);
 
-            next_img.setPosition(this.offsetX, this.offsetY + (7 - this.height()) * 32);
-            this.visible.push(next_img);
+            next.setPosition(this.offsetX, this.offsetY + (7 - this.height()) * 32);
+            this.visible.push(next);
         }
 
-        else if (shape.check_compatibility(this.tower[this.tower.length - 1], next)) {
+        else if (this.tower[this.tower.length - 1].check_compatibility(next)) {
             // add to player's tower
             this.tower.push(next);
 
             // with this shape, tower levels up
             if (this.visible.length > 4) {
-                this.visible.push(next_img);
+                this.visible.push(next);
                 this.level_up(scene);
             }
 
@@ -34,9 +35,9 @@ class Player {
             else {
                 let x = this.offsetX;
                 let y = this.offsetY + (7 - this.height()) * 32;
-                utils.moveTo(scene, next_img, x, y, 3,
-                            utils.play_animation, [scene, 'dust', x, y]);
-                this.visible.push(next_img);
+                utils.moveTo(scene, next, x, y, 3,
+                             utils.play_animation, [scene, 'dust', x, y]);
+                this.visible.push(next);
             }
 
             // update score
@@ -76,7 +77,7 @@ class Player {
         }
 
         else {
-            utils.play_animation(scene, 'explosion',this.offsetX + 8, this.offsetY + 6 * 32 + 8);
+            utils.play_animation(scene, 'explosion', this.offsetX + 8, this.offsetY + 6 * 32 + 8);
         }
 
         // update score & return diff
@@ -104,7 +105,7 @@ class Player {
 
             // double color -> sum 2x2 points - 2x1 base points = 2x1 extra points = 2 pts
             for (var i = 0; i < tower.length - 1; i++) {
-                if (shape.check_color(tower[i], tower[i + 1])) {
+                if (tower[i].check_color(tower[i + 1])) {
                     score += 2;
                 }
             }
@@ -112,7 +113,7 @@ class Player {
             // triple color -> sum 3x3 points - 3x1 base points - 2x2 extra from double bonus = 9 - 3 - 4 pts = 2 pts
             if (tower.length > 2) {
                 for(var i = 0; i < tower.length - 2; i+=2) {
-                    if (shape.check_color(tower[i], tower[i + 1]) && shape.check_color(tower[i + 1], tower[i + 2])) {
+                    if (tower[i].check_color(tower[i + 1]) && tower[i + 1].check_color(tower[i + 2])) {
                         score += 2;
                     }
                 }
@@ -136,6 +137,7 @@ class Player {
         }
         this.visible = [];
 
-
+        this.active_effects = [];
     }
+
 }
