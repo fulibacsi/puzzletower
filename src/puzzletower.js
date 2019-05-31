@@ -396,7 +396,7 @@ class PuzzleTower extends Phaser.Scene {
         scene.timer.remove()
         scene.timer = scene.time.addEvent({
             'delay': 1000, // every second
-            'repeat': 31,
+            'repeat': scene.round_time + 1,
             'startAt': 0,
             'callback': function(scene) {
                 if (scene.remaining_time < 0) {
