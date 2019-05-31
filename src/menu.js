@@ -161,7 +161,7 @@ class RoundUp extends Phaser.Scene {
         }
 
         // PRESS SPACE TO CONTINUE...
-        this.add.text(140, 330, 'PRESS SPACE TO CONTIUE...', assets.texts['menu']).setOrigin(0, 0);
+        this.add.text(140, 330, 'PRESS SPACE TO CONTINUE...', assets.texts['menu']).setOrigin(0, 0);
 
         // SPACE PRESS EVENT
         this.input.keyboard.on('keydown-SPACE', function (event) {

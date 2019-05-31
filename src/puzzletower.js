@@ -31,6 +31,11 @@ class PuzzleTower extends Phaser.Scene {
         // input key container
         this.cursors = {};
 
+        // gamepads
+        this.pads = {};
+        this.button_A_pressed = {};
+        this.button_B_pressed = {};
+
         // score displays
         this.score_popups = {};
         this.scoreboards = {};
@@ -65,6 +70,8 @@ class PuzzleTower extends Phaser.Scene {
 
             // controls
             this.cursors[name] = this.input.keyboard.addKeys(assets.controls[name]);
+            this.button_A_pressed[name] = false;
+            this.button_B_pressed[name] = false;
 
             // PLAYER FRAME
             this.add.image(this.players[name].offsetX - 50,
@@ -84,9 +91,9 @@ class PuzzleTower extends Phaser.Scene {
                 this.frame_effects[name][effect] = this.add.image(this.players[name].offsetX - 50,
                                                                   this.players[name].offsetY - 40,
                                                                   'frame_effect_' + effect)
-                                                          .setOrigin(0, 0)
-                                                          .setDepth(1)
-                                                          .setAlpha(0);
+                                                           .setOrigin(0, 0)
+                                                           .setDepth(1)
+                                                           .setAlpha(0);
             }
 
             // name
@@ -138,6 +145,10 @@ class PuzzleTower extends Phaser.Scene {
             this.scene.start('MainMenu');
         }
 
+        if (this.input.gamepad.total !== 0) {
+            this.pads = this.input.gamepad.gamepads;
+        }
+
         // TOUCH CONTROLS FOR P1
         if (this.number_of_players == 1) {
             if (this.nextmove == 'drop') {
@@ -157,6 +168,7 @@ class PuzzleTower extends Phaser.Scene {
         for (var name in this.players) {
             // get player stuff
             var cursor = this.cursors[name];
+            var playerpad = this.pads[parseInt(name[1]) - 1];
 
             // player has freeze effect - cannot move
             if (this.players[name].active_effects.indexOf('freeze') > -1) {
@@ -181,18 +193,25 @@ class PuzzleTower extends Phaser.Scene {
                 else this.frame_effects[name]['leader'].setAlpha(0);
 
                 // drop command
-                if (Phaser.Input.Keyboard.JustDown(cursor.drop)) {
+                if (Phaser.Input.Keyboard.JustDown(cursor.drop) || (playerpad && playerpad.buttons[0].value && (!this.button_A_pressed[name]))) {
+                    this.button_A_pressed[name] = true;
                     // if shocked -> reversed control
                     if (this.players[name].active_effects.indexOf('shock') > -1) this.skip(name);
                     else this.drop(name);
                 }
 
                 // skip command
-                else if (Phaser.Input.Keyboard.JustDown(cursor.skip)) {
+                else if (Phaser.Input.Keyboard.JustDown(cursor.skip) || (playerpad && playerpad.buttons[1].value && (!this.button_B_pressed[name]))) {
+                    this.button_B_pressed[name] = true;
                     // if shocked -> reversed control
                     if (this.players[name].active_effects.indexOf('shock') > -1) this.drop(name);
                     else this.skip(name);
                 }
+
+                if (playerpad && !playerpad.buttons[0].value && (this.button_A_pressed[name]))
+                    this.button_A_pressed[name] = false;
+                if (playerpad && !playerpad.buttons[1].value && (this.button_B_pressed[name]))
+                    this.button_B_pressed[name] = false;
             }
         }
     }

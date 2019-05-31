@@ -8,6 +8,9 @@ var config = {
     scale : {
         autoCenter: Phaser.Scale.Center.CENTER_BOTH,
         mode: Phaser.Scale.ScaleModes.FIT
+    },
+    input: {
+        gamepad: true
     }
 }
 
