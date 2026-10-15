@@ -31,6 +31,20 @@ class PuzzleTower extends Phaser.Scene {
         // input key container
         this.cursors = {};
 
+        // key presses are counted when their keydown event arrives and consumed in update(),
+        // because JustDown() misses a tap that starts and ends between two frames
+        this.key_presses = {};
+        this.key_bindings = {};
+        this.counted_key_events = new WeakSet();
+        this.input.keyboard.on('keydown', this.count_key_press, this);
+
+        // keyups are not processed while the scene is paused (countdown, round results),
+        // so a key released meanwhile would stay down and swallow its next press
+        this.events.on('resume', this.reset_key_presses, this);
+        this.events.once('shutdown', function () {
+            this.events.off('resume', this.reset_key_presses, this);
+        }, this);
+
         // gamepads
         this.pads = {};
         this.button_A_pressed = {};
@@ -70,6 +84,10 @@ class PuzzleTower extends Phaser.Scene {
 
             // controls
             this.cursors[name] = this.input.keyboard.addKeys(assets.controls[name]);
+            this.key_presses[name] = {'drop': 0, 'skip': 0};
+            for (var action in this.key_presses[name]) {
+                this.key_bindings[this.cursors[name][action].keyCode] = {'name': name, 'action': action};
+            }
             this.button_A_pressed[name] = false;
             this.button_B_pressed[name] = false;
 
@@ -167,12 +185,14 @@ class PuzzleTower extends Phaser.Scene {
 
         for (var name in this.players) {
             // get player stuff
-            var cursor = this.cursors[name];
             var playerpad = this.pads[parseInt(name[1]) - 1];
 
             // player has freeze effect - cannot move
             if (this.players[name].active_effects.indexOf('freeze') > -1) {
                 this.frame_effects[name]['freeze'].setAlpha(1);
+                // forget presses made while frozen
+                this.key_presses[name]['drop'] = 0;
+                this.key_presses[name]['skip'] = 0;
             }
 
             // no freeze effect - move freely
@@ -193,7 +213,7 @@ class PuzzleTower extends Phaser.Scene {
                 else this.frame_effects[name]['leader'].setAlpha(0);
 
                 // drop command
-                if (Phaser.Input.Keyboard.JustDown(cursor.drop) || (playerpad && playerpad.buttons[0].value && (!this.button_A_pressed[name]))) {
+                if (this.take_key_press(name, 'drop') || (playerpad && playerpad.buttons[0].value && (!this.button_A_pressed[name]))) {
                     this.button_A_pressed[name] = true;
                     // if shocked -> reversed control
                     if (this.players[name].active_effects.indexOf('shock') > -1) this.skip(name);
@@ -201,7 +221,7 @@ class PuzzleTower extends Phaser.Scene {
                 }
 
                 // skip command
-                else if (Phaser.Input.Keyboard.JustDown(cursor.skip) || (playerpad && playerpad.buttons[1].value && (!this.button_B_pressed[name]))) {
+                else if (this.take_key_press(name, 'skip') || (playerpad && playerpad.buttons[1].value && (!this.button_B_pressed[name]))) {
                     this.button_B_pressed[name] = true;
                     // if shocked -> reversed control
                     if (this.players[name].active_effects.indexOf('shock') > -1) this.drop(name);
@@ -213,6 +233,31 @@ class PuzzleTower extends Phaser.Scene {
                 if (playerpad && !playerpad.buttons[1].value && (this.button_B_pressed[name]))
                     this.button_B_pressed[name] = false;
             }
+        }
+    }
+
+
+    count_key_press(event) {
+        var binding = this.key_bindings[event.keyCode];
+        // Phaser re-emits the earlier key events of a frame each time a new one arrives
+        if (binding === undefined || this.counted_key_events.has(event)) return;
+        this.counted_key_events.add(event);
+        this.key_presses[binding.name][binding.action]++;
+    }
+
+
+    take_key_press(name, action) {
+        if (this.key_presses[name][action] == 0) return false;
+        this.key_presses[name][action]--;
+        return true;
+    }
+
+
+    reset_key_presses() {
+        this.input.keyboard.resetKeys();
+        for (var name in this.key_presses) {
+            this.key_presses[name]['drop'] = 0;
+            this.key_presses[name]['skip'] = 0;
         }
     }
 
